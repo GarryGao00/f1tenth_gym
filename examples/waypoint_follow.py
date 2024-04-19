@@ -2,7 +2,7 @@ import time
 from f110_gym.envs.base_classes import Integrator
 import yaml
 import gym
-import numpy as np
+from gym.core import RewardWrapper
 from argparse import Namespace
 import pickle
 
@@ -295,6 +295,12 @@ class QLearningPlanner:
         pass
 
 
+class Reward(RewardWrapper):
+    def reward(self, reward):
+        transformed_reward = reward * 0.5
+        return transformed_reward
+
+
 
 def main():
     """
@@ -312,7 +318,8 @@ def main():
     
     
     
-    planner = QLearningPlanner(state_space=100, action_space=5, load_file="final_q_table.pkl")
+    # planner = QLearningPlanner(state_space=100, action_space=5, load_file="final_q_table.pkl")
+    planner = QLearningPlanner(state_space=100, action_space=5)
 
     def render_callback(env_renderer):
         # custom extra drawing function
@@ -352,7 +359,7 @@ def main():
         obs, step_reward, done, info = env.step(np.array([[action_output[1], action_output[0]]]))  # Note: the order might need to be adjusted based on your env
         
         ###TODO - reward should be modified here
-
+        
         
         next_state = planner.compute_state(obs['poses_x'][0], obs['poses_y'][0], obs['poses_theta'][0], work['tlad'], work['vgain'])
         
